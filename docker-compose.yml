@@ -1,0 +1,61 @@
+version: "3.9"
+
+services:
+
+  app:
+    build:
+      context: ./docker/php
+    container_name: laravel_app
+    volumes:
+      - ./hotel:/var/www/html
+    networks:
+      - laravel
+
+  node:
+    build:
+      context: ./docker/node
+    container_name: node_builder
+    ports:
+      - "5173:5173"
+    working_dir: /var/www/html
+    volumes:
+      - ./hotel:/var/www/html
+    entrypoint: [ "tail", "-f", "/dev/null" ]
+    networks:
+      - laravel
+
+  nginx:
+    build:
+      context: ./docker/nginx
+    container_name: nginx_server
+    ports:
+      - "80:80"
+    volumes:
+      - ./hotel:/var/www/html
+    depends_on:
+      - app
+    networks:
+      - laravel
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - laravel
+
+volumes:
+  mysql_data:
+
+
+networks:
+  laravel:
