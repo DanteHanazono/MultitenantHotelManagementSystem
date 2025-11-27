@@ -54,7 +54,7 @@ const adminNavItems: NavItem[] = [
     },
     {
         title: 'Manage Hotels',
-        href: '/manage-hotels',
+        href: '/hotels',
         icon: Building,
     },
 ];
